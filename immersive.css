@@ -1,0 +1,144 @@
+/* ============================================================
+   IMMERSIVE ART LAYER  —  decorative, non-destructive overlays
+   Toggled by a body class: art-cinema | art-editorial | art-kinetic
+   Default (no class) = clean original.
+   ============================================================ */
+
+/* ---- shared film-grain overlay (used by cinema + kinetic) ---- */
+#artGrain {
+  position: fixed; inset: 0; z-index: 9990; pointer-events: none;
+  opacity: 0; transition: opacity .4s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  animation: grainShift 0.6s steps(3) infinite;
+}
+@keyframes grainShift {
+  0%{transform:translate(0,0)} 33%{transform:translate(-4%,2%)} 66%{transform:translate(3%,-3%)} 100%{transform:translate(0,0)}
+}
+body.art-cinema #artGrain { opacity: .07; }
+body.art-kinetic #artGrain { opacity: .05; }
+
+/* ---- kinetic particle canvas ---- */
+#artCanvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity .5s ease;
+}
+body.art-kinetic #artCanvas { opacity: 1; }
+body.art-kinetic .section, body.art-kinetic .deep, body.art-kinetic footer { position: relative; z-index: 1; }
+
+/* ============================================================
+   CINEMA  —  filmstrip, letterbox, projector glow, vignette
+   ============================================================ */
+body.art-cinema { --art-accent: var(--clay); }
+
+/* letterbox bars + vignette on hero */
+body.art-cinema .hero-section::before,
+body.art-cinema .hero-section::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 26px; z-index: 3; pointer-events: none;
+  background: var(--deep);
+}
+body.art-cinema .hero-section::before { top: 0; }
+body.art-cinema .hero-section::after  { bottom: 0; box-shadow: 0 0 120px 40px rgba(30,39,29,.25) inset; }
+
+/* projector glow + frame ticks behind portrait */
+body.art-cinema .hero-grid figure img {
+  box-shadow: 0 0 0 4px var(--deep), 0 0 60px 8px rgba(156,107,47,.35);
+  filter: contrast(1.06) saturate(1.05);
+}
+
+/* sprocket-hole filmstrip on dark sections */
+body.art-cinema .deep { position: relative; }
+body.art-cinema .deep::before,
+body.art-cinema .deep::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 16px; z-index: 2; pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 14px,
+      rgba(237,239,228,.85) 14px 24px,
+      transparent 24px 38px);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 14px, transparent 14px 38px);
+  background: transparent;
+}
+/* actual punched holes */
+body.art-cinema .deep::before { top: 6px; }
+body.art-cinema .deep::after  { bottom: 6px; }
+body.art-cinema .deep > .container::before,
+body.art-cinema .deep > .container::after {
+  content:""; position:absolute; left:0; right:0; height:12px; pointer-events:none; z-index:2;
+  background-image: radial-gradient(circle, rgba(237,239,228,.55) 0 3px, transparent 3.5px);
+  background-size: 26px 12px; background-repeat: repeat-x;
+}
+body.art-cinema .deep > .container { position: relative; }
+body.art-cinema .deep > .container::before { top: -22px; }
+body.art-cinema .deep > .container::after  { bottom: -22px; }
+
+/* subtle page vignette */
+body.art-cinema::after {
+  content:""; position: fixed; inset: 0; z-index: 9989; pointer-events: none;
+  box-shadow: inset 0 0 220px 40px rgba(20,25,18,.22);
+}
+
+/* ============================================================
+   EDITORIAL  —  halftone, duotone portrait, print accents
+   ============================================================ */
+body.art-editorial .section.alt,
+body.art-editorial .deep {
+  background-image:
+    radial-gradient(circle, currentColor 0 1px, transparent 1.4px);
+  background-size: 12px 12px;
+}
+body.art-editorial .section.alt { color: rgba(27,35,27,.06); }
+body.art-editorial .deep { color: rgba(237,239,228,.05); }
+/* keep real text full-strength (override the currentColor trick) */
+body.art-editorial .section.alt > .container,
+body.art-editorial .deep > .container { color: initial; }
+
+/* halftone duotone portrait with hard offset block */
+body.art-editorial .hero-grid figure { position: relative; }
+body.art-editorial .hero-grid figure img {
+  filter: grayscale(1) contrast(1.15) brightness(1.02);
+  mix-blend-mode: multiply;
+}
+body.art-editorial .hero-grid figure > div { background: var(--clay); }
+body.art-editorial .hero-grid figure > div::after {
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:6px;
+  background-image: radial-gradient(circle, rgba(30,39,29,.5) 0 1.1px, transparent 1.6px);
+  background-size: 5px 5px; mix-blend-mode: multiply; opacity:.55;
+}
+
+/* oversized section labels feel like print masthead */
+body.art-editorial .section-label .sl-mark { font-weight: 700; }
+
+/* ============================================================
+   SWITCHER WIDGET
+   ============================================================ */
+#artSwitcher {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 9px;
+  background: var(--deep); color: var(--on-deep);
+  padding: 14px; border-radius: 14px;
+  box-shadow: 0 14px 38px rgba(0,0,0,.32);
+  font-family: var(--mono); font-size: 11px;
+  max-width: 220px;
+}
+#artSwitcher .as-title { letter-spacing: .14em; text-transform: uppercase; color: var(--on-deep-muted); }
+#artSwitcher .as-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+#artSwitcher button {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  background: transparent; border: 1px solid var(--line-deep);
+  color: var(--on-deep); font-family: inherit; font-size: 11px;
+  padding: 9px 10px; border-radius: 9px; cursor: pointer;
+  transition: border-color .15s, background .15s;
+  text-align: left;
+}
+#artSwitcher button .as-k { font-weight: 700; letter-spacing: .02em; }
+#artSwitcher button .as-d { color: var(--on-deep-muted); font-size: 9.5px; line-height: 1.3; }
+#artSwitcher button:hover { border-color: var(--clay-2); }
+#artSwitcher button.active { border-color: var(--clay-2); background: rgba(192,143,76,.14); }
+#artSwitcher .as-collapse {
+  align-self: flex-end; background: none; border: none; color: var(--on-deep-muted);
+  cursor: pointer; font-family: inherit; font-size: 10px; padding: 0; text-transform: uppercase; letter-spacing:.1em;
+}
+#artSwitcher.collapsed .as-grid, #artSwitcher.collapsed .as-title { display: none; }
+
+@media (max-width: 600px) { #artSwitcher { right: 10px; bottom: 10px; max-width: 180px; } }
