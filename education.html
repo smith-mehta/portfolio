@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Education — Dr. Smith Mehta</title>
+<meta name="description" content="The academic journey of Dr. Smith Mehta — from a Bachelor of Commerce in Mumbai to a PhD in Creative Industries in Brisbane, by way of journalism and media law, leading to a professorship in Groningen." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="style.css?v=5" />
+<style>
+  /* ============ THE ROUTE — interactive journey ============ */
+  .route-wrap { margin-top: 14px; }
+
+  /* Field-evolution ribbon */
+  .field-ribbon { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 40px; }
+  .field-step {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--line-2); border-radius: 40px; padding: 6px 13px;
+    background: transparent; cursor: pointer; transition: all .25s; white-space: nowrap;
+  }
+  .field-step .ar { color: var(--line-2); margin: 0 2px 0 9px; }
+  .field-step.on { color: var(--paper); background: var(--clay); border-color: var(--clay); }
+
+  /* The rail */
+  .rail { position: relative; height: 132px; margin: 0 6px 8px; }
+  .rail svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .rail .track { fill: none; stroke: var(--line-2); stroke-width: 2; stroke-dasharray: 2 7; stroke-linecap: round; }
+  .rail .progress {
+    fill: none; stroke: var(--clay); stroke-width: 2.5; stroke-linecap: round;
+    stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset 1.4s cubic-bezier(.65,.02,.25,1);
+  }
+  .rail.drawn .progress { stroke-dashoffset: 0; }
+
+  .stations { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; }
+  .station { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .station .yr {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted);
+    margin-bottom: 14px; transition: color .25s; white-space: nowrap;
+  }
+  .station .node {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--paper); border: 2px solid var(--line-2);
+    box-sizing: border-box; transition: all .3s cubic-bezier(.2,.8,.3,1.2); position: relative; z-index: 2;
+  }
+  .station .city {
+    font-size: 14.5px; font-weight: 600; color: var(--ink-soft); margin-top: 14px; transition: color .25s;
+    white-space: nowrap;
+  }
+  .station .country { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .station:hover .node { border-color: var(--clay); transform: scale(1.15); }
+  .station.on .node { border-color: var(--clay); background: var(--clay); transform: scale(1.35); box-shadow: 0 0 0 6px color-mix(in oklab, var(--clay) 14%, transparent); }
+  .station.on .yr { color: var(--clay); }
+  .station.on .city { color: var(--ink); }
+
+  /* Terminus */
+  .terminus { display: flex; align-items: center; gap: 14px; justify-content: flex-end; margin: 6px 6px 0; }
+  .terminus .dest {
+    display: inline-flex; align-items: baseline; gap: 10px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .terminus .dest b { font-family: var(--sans); font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--clay); font-weight: 700; }
+
+  /* Detail stage */
+  .stage {
+    display: grid; grid-template-columns: 230px 1fr; gap: clamp(28px, 4vw, 56px);
+    border-top: 1px solid var(--line); margin-top: 40px; padding-top: 38px; min-height: 240px;
+  }
+  .stage-side .big-yr { font-family: var(--display); font-size: clamp(46px, 6vw, 78px); line-height: 0.92; color: var(--ink); }
+  .stage-side .loc { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--clay); margin-top: 10px; }
+  .stage-side .fld {
+    display: inline-block; margin-top: 18px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-2); border-radius: 40px; padding: 5px 12px;
+  }
+  .stage-main h3 { font-family: var(--display); font-size: clamp(28px, 3.6vw, 46px); line-height: 1.04; margin: 4px 0 10px; color: var(--ink); }
+  .stage-main .inst { font-size: 17px; color: var(--ink-soft); margin: 0 0 4px; }
+  .stage-main .inst b { color: var(--ink); font-weight: 600; }
+  .stage-main .grade {
+    display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
+    border: 1px solid var(--line-2); border-radius: 40px; padding: 4px 11px; margin-top: 14px;
+  }
+  .stage-main ul { margin: 16px 0 0; padding-left: 18px; }
+  .stage-main li { font-size: 15.5px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 6px; }
+  .stage-side, .stage-main { opacity: 1; }
+  .stage.swap .stage-side, .stage.swap .stage-main { animation: stageIn .42s cubic-bezier(.2,.8,.3,1); }
+  @keyframes stageIn { from { transform: translateY(9px); } to { transform: none; } }
+
+  /* Qualifications — passport stamps */
+  .qual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+  .qual-card {
+    position: relative; border: 1px solid var(--line-2); border-radius: 10px; padding: 26px 26px 24px;
+    background: rgba(255,255,255,0.45); overflow: hidden;
+  }
+  .qual-card::after {
+    content: ""; position: absolute; right: -28px; top: -28px; width: 92px; height: 92px; border-radius: 50%;
+    border: 2px dashed color-mix(in oklab, var(--clay) 38%, transparent); opacity: .5;
+  }
+  .qual-card .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); }
+  .qual-card h3 { font-size: 18px; font-weight: 700; margin: 12px 0 6px; line-height: 1.3; }
+  .qual-card p { font-size: 14.5px; color: var(--muted); margin: 0; line-height: 1.55; max-width: 34ch; }
+
+  @media (max-width: 760px) {
+    .rail { display: none; }
+    .terminus { display: none; }
+    .stations { position: static; flex-direction: column; align-items: stretch; gap: 10px; }
+    .station { flex-direction: row; gap: 14px; align-items: center; justify-content: flex-start;
+      border: 1px solid var(--line-2); border-radius: 10px; padding: 14px 16px; }
+    .station .yr, .station .city, .station .country { margin: 0; }
+    .station .node { display: none; }
+    .station .city { flex: 1; }
+    .station.on { border-color: var(--clay); background: color-mix(in oklab, var(--clay) 8%, transparent); }
+    .stage { grid-template-columns: 1fr; gap: 18px; }
+    .qual-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="index.html">Smith Mehta<span class="dot">.</span></a>
+    <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="research.html">Research</a>
+      <a href="teaching.html">Teaching</a>
+      <a href="industry.html">Industry</a>
+      <a href="grants.html">Grants</a>
+      <a href="education.html" class="active">Education</a>
+      <a href="cv.html">CV</a>
+      <a href="contact.html" class="pill">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== PAGE HERO ===================== -->
+<section class="section section--tight">
+  <div class="container">
+    <p class="kicker"><span class="sl-mark">Education</span></p>
+    <h1 class="display" style="max-width:18ch;">A training across <em>media, law</em> &amp; commerce.</h1>
+    <p class="lead" style="max-width:62ch; margin-top:28px;">Fifteen years of study across four cities and three countries — moving steadily from commerce, through journalism and media law, to a doctorate in the creative industries. Trace the route below.</p>
+  </div>
+</section>
+
+<!-- ===================== THE ROUTE ===================== -->
+<section class="section section--tight alt" id="degrees">
+  <div class="container container--wide">
+    <p class="section-label"><span class="sl-mark">The route</span></p>
+    <div class="net-head" style="margin-bottom:18px;">
+      <h2 class="display" style="max-width:20ch;">From a Mumbai commerce degree to a Brisbane <em>doctorate</em>.</h2>
+    </div>
+
+    <div class="field-ribbon" id="fieldRibbon"></div>
+
+    <div class="route-wrap">
+      <div class="rail" id="rail">
+        <svg viewBox="0 0 1000 132" preserveAspectRatio="none" aria-hidden="true">
+          <path class="track" d="M 60 66 H 940" />
+          <path class="progress" id="railProg" d="M 60 66 H 940" />
+        </svg>
+        <div class="stations" id="stations"></div>
+      </div>
+
+      <div class="terminus">
+        <span class="dest">Leads to → <b>Groningen, NL · Assistant Professor</b></span>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="stage-side">
+          <div class="big-yr" id="sYr"></div>
+          <div class="loc" id="sLoc"></div>
+          <span class="fld" id="sFld"></span>
+        </div>
+        <div class="stage-main">
+          <h3 id="sTitle"></h3>
+          <p class="inst" id="sInst"></p>
+          <span class="grade" id="sGrade"></span>
+          <ul id="sList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEGREES IN FULL ===================== -->
+<section class="section section--tight" id="degrees-list">
+  <div class="container">
+    <p class="section-label"><span class="sl-mark">Degrees in full</span></p>
+    <div class="cv-group" style="border-top:none; padding-top:8px;">
+      <div class="cv-group__label"><span class="sl-mark">Qualifications</span></div>
+      <div>
+        <div class="cv-entry">
+          <div class="when">2017 — 2021</div>
+          <h3>PhD, Creative Industries</h3>
+          <div class="where">Digital Media Research Centre, Queensland University of Technology, Australia</div>
+          <ul>
+            <li>Dissertation on the digital transformation of the Indian screen industries.</li>
+            <li>Conducted and analysed 90+ interviews with media practitioners.</li>
+            <li>Published insights across 5+ empirical papers and 10 conference presentations.</li>
+            <li>Co-developed curriculum, tutored &amp; graded media courses for 100+ students.</li>
+          </ul>
+        </div>
+        <div class="cv-entry">
+          <div class="when">2013 — 2014</div>
+          <h3>Post Graduate Diploma in Media Laws (A Grade)</h3>
+          <div class="where">National Academy of Legal Studies &amp; Research (NALSAR), distance diploma</div>
+          <ul>
+            <li>Key topics: media laws, advertising laws, public policy.</li>
+          </ul>
+        </div>
+        <div class="cv-entry">
+          <div class="when">2011 — 2013</div>
+          <h3>MA, Mass Media &amp; Communications (Journalism)</h3>
+          <div class="where">Symbiosis Institute of Mass Media &amp; Communications, Pune, India</div>
+        </div>
+        <div class="cv-entry">
+          <div class="when">2006 — 2011</div>
+          <h3>Bachelor of Commerce</h3>
+          <div class="where">R.A. Podar College of Commerce &amp; Economics, Mumbai, India</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TEACHING QUALIFICATIONS ===================== -->
+<section class="section section--tight" id="qualifications">
+  <div class="container">
+    <p class="section-label"><span class="sl-mark">Teaching qualifications</span></p>
+    <h2 class="display" style="max-width:18ch; margin:0 0 32px; font-size:clamp(28px,4vw,46px);">Accredited to teach across <em>three</em> countries.</h2>
+    <div class="qual-grid">
+      <div class="qual-card">
+        <span class="tag">Fellowship</span>
+        <h3>Fellow of the Higher Education Academy</h3>
+        <p>Recognised teaching qualification across the United Kingdom and Australia.</p>
+      </div>
+      <div class="qual-card">
+        <span class="tag">Certification</span>
+        <h3>University Teaching Qualification (UTQ / BKO)</h3>
+        <p>Certified University Teaching Qualification in Higher Education, the Netherlands.</p>
+      </div>
+    </div>
+    <a class="tlink" href="cv.html" style="display:inline-block; margin-top:30px;">See the full curriculum vitae →</a>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container container--wide">
+    <div class="foot-top">
+      <div class="big">Let's talk media,<br/><em>industries</em> &amp; labour.</div>
+      <div class="foot-col">
+        <h4>Navigate</h4>
+        <a href="index.html">Home</a>
+        <a href="research.html">Research</a>
+        <a href="teaching.html">Teaching</a>
+        <a href="industry.html">Industry</a>
+        <a href="grants.html">Grants</a>
+        <a href="education.html">Education</a>
+        <a href="cv.html">CV</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h4>Elsewhere</h4>
+        <div class="foot-logos">
+          <a href="mailto:smitmehta9591@gmail.com" aria-label="Email" title="smitmehta9591@gmail.com">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M2 6.5 12 13l10-6.5V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v.5z"/><path fill="#fff" d="M2 6.5V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6.5L12 13 2 6.5z"/><path fill="#C5221F" d="M2 6.5V6a2 2 0 0 1 2-2l8 6L2 6.5z"/><path fill="#C5221F" d="M22 6.5V6a2 2 0 0 0-2-2l-8 6 10-3.5z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/smithmehta" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0A66C2" d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+          </a>
+          <a href="https://scholar.google.com/citations?user=PSNeib4AAAAJ&hl=en" target="_blank" rel="noopener" aria-label="Google Scholar" title="Google Scholar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M12 1L1 6l11 5 9-4.09V14h2V6L12 1z"/><path fill="#34A853" d="M5 11.18v3.32C5 16.43 8.13 18 12 18s7-1.57 7-3.5v-3.32l-7 3.18-7-3.18z"/></svg>
+          </a>
+          <a href="https://orcid.org/0000-0002-9429-3240" target="_blank" rel="noopener" aria-label="ORCID" title="ORCID 0000-0002-9429-3240">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#A6CE39"/><path fill="#fff" d="M7.7 8.4a.86.86 0 1 1 0-1.72.86.86 0 0 1 0 1.72zM7.05 9.6h1.3v7.7h-1.3V9.6zm3.2 0h3.18c3.03 0 4.36 2.17 4.36 3.86 0 1.84-1.44 3.86-4.34 3.86h-3.2V9.6zm1.3 1.18v5.34h1.74c2.48 0 3.05-1.88 3.05-2.67 0-1.29-.82-2.67-3.1-2.67h-1.69z"/></svg>
+          </a>
+          <a href="https://www.imdb.com/name/nm14310551/" target="_blank" rel="noopener" aria-label="IMDb" title="IMDb">
+            <svg viewBox="0 0 48 24" aria-hidden="true"><rect width="48" height="24" rx="4" fill="#F5C518"/><text x="24" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="13" fill="#000">IMDb</text></svg>
+          </a>
+          <a href="https://www.webofscience.com/wos/author/record/AAY-8425-2020" target="_blank" rel="noopener" aria-label="Web of Science" title="Web of Science — Reviewer record">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#6E40C9" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="#6E40C9"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6" stroke="#6E40C9" stroke-width="2" stroke-linecap="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Dr. Smith Mehta</span>
+      <span>University of Groningen · Netherlands</span>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+<script>
+(function () {
+  var STOPS = [
+    { yr: '2006 — 2011', city: 'Mumbai', country: 'India', field: 'Commerce',
+      title: 'Bachelor of Commerce',
+      inst: '<b>R.A. Podar College of Commerce &amp; Economics</b>, Mumbai',
+      grade: '', bullets: [
+        'Foundational training in commerce, accounting and economics.',
+        'The starting point — before a pivot toward media and communication.'
+      ] },
+    { yr: '2011 — 2013', city: 'Pune', country: 'India', field: 'Journalism',
+      title: 'MA, Mass Media &amp; Communications',
+      inst: '<b>Symbiosis Institute of Mass Media &amp; Communications</b>, Pune',
+      grade: 'Specialisation: Journalism · 3.02 GPA', bullets: [
+        'Specialised in journalism and the craft of reporting.',
+        'First sustained engagement with media industries and audiences.'
+      ] },
+    { yr: '2013 — 2014', city: 'NALSAR', country: 'Distance · India', field: 'Media Law',
+      title: 'PG Diploma, Media Laws',
+      inst: '<b>National Academy of Legal Studies &amp; Research (NALSAR)</b>, distance diploma',
+      grade: 'A Grade', bullets: [
+        'Key topics: media laws, advertising laws and public policy.',
+        'Grounded later research on censorship and platform regulation.'
+      ] },
+    { yr: '2017 — 2021', city: 'Brisbane', country: 'Australia', field: 'Creative Industries',
+      title: 'PhD, Creative Industries',
+      inst: '<b>Digital Media Research Centre, Queensland University of Technology</b>',
+      grade: '', bullets: [
+        'Dissertation on the digital transformation of the Indian screen industries.',
+        'Conducted and analysed 90+ interviews with media practitioners.',
+        'Communicated findings across 5+ empirical papers and 10 conference talks.',
+        'Co-developed curriculum, tutored &amp; graded media courses for 100+ students.'
+      ] }
+  ];
+
+  var stationsEl = document.getElementById('stations');
+  var ribbonEl = document.getElementById('fieldRibbon');
+  var railEl = document.getElementById('rail');
+  var prog = document.getElementById('railProg');
+  var stage = document.getElementById('stage');
+  var els = {
+    yr: document.getElementById('sYr'), loc: document.getElementById('sLoc'),
+    fld: document.getElementById('sFld'), title: document.getElementById('sTitle'),
+    inst: document.getElementById('sInst'), grade: document.getElementById('sGrade'),
+    list: document.getElementById('sList')
+  };
+
+  // Build field ribbon
+  STOPS.forEach(function (s, i) {
+    var f = document.createElement('button');
+    f.className = 'field-step'; f.type = 'button';
+    f.innerHTML = s.field + (i < STOPS.length - 1 ? '<span class="ar">→</span>' : '');
+    f.addEventListener('click', function () { select(i); });
+    f.addEventListener('mouseenter', function () { select(i); });
+    ribbonEl.appendChild(f); s._f = f;
+  });
+
+  // Build stations
+  STOPS.forEach(function (s, i) {
+    var st = document.createElement('div');
+    st.className = 'station';
+    st.innerHTML = '<div class="yr">' + s.yr + '</div>' +
+      '<div class="node"></div>' +
+      '<div class="city">' + s.city + '</div>' +
+      '<div class="country">' + s.country + '</div>';
+    st.addEventListener('click', function () { select(i); });
+    st.addEventListener('mouseenter', function () { select(i); });
+    stationsEl.appendChild(st); s._s = st;
+  });
+
+  var current = 0;
+
+  function highlight(i) {
+    STOPS.forEach(function (s, k) {
+      s._s.classList.toggle('on', k === i);
+      s._f.classList.toggle('on', k === i);
+    });
+  }
+
+  function select(i) {
+    current = i;
+    highlight(i);
+    var s = STOPS[i];
+    els.yr.textContent = s.yr.split(' — ')[1] || s.yr;
+    els.yr.innerHTML = "<span style='font-size:.62em; color:var(--muted)'>" + s.yr.split(' — ')[0] + "–</span>" + (s.yr.split(' — ')[1] || '');
+    els.loc.textContent = s.city + (s.country.indexOf('Distance') === 0 ? '' : ', ' + s.country);
+    els.fld.textContent = s.field;
+    els.title.innerHTML = s.title;
+    els.inst.innerHTML = s.inst;
+    if (s.grade) { els.grade.style.display = 'inline-block'; els.grade.textContent = s.grade; }
+    else { els.grade.style.display = 'none'; }
+    els.list.innerHTML = s.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('');
+    stage.classList.remove('swap'); void stage.offsetWidth; stage.classList.add('swap');
+  }
+
+  // Set progress dash length and draw on reveal
+  try {
+    var len = prog.getTotalLength();
+    prog.style.setProperty('--len', len);
+  } catch (e) {}
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { railEl.classList.add('drawn'); io.disconnect(); } });
+    }, { threshold: 0.35 });
+    io.observe(railEl);
+  } else { railEl.classList.add('drawn'); }
+
+  select(0);
+})();
+</script>
+</body>
+</html>
